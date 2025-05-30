@@ -52,3 +52,57 @@ class PerkenalanPage(tk.Frame):
         tk.Label(self, text="Perkenalan Kelompok", font=("Arial", 18, "bold"), bg="#E0F7FA").pack(pady=20)
         tk.Label(self, text="Kelompok SDA:\n- Krisvelix William_2417051021\n- Setia Diva Erlandi_2417051072\n- Zamzawii Lutfi_2417051016\n- Fahmi Isma Yuda_2417051062",
                  font=("Arial", 12), justify="left", bg="#E0F7FA").pack(pady=10)
+tk.Button(self, text="Lanjut ke Halaman Teori", font=("Arial", 12), bg="#43A047", fg="white", 
+                  command=lambda: controller.show_frame(TeoriPage)).pack(pady=10)
+
+class TeoriPage(tk.Frame):
+    def _init_(self, parent, controller):
+        super()._init_(parent, bg="#E0F7FA")
+
+        tk.Label(self, text="Project SDA - Teori & Skor", font=("Arial", 16, "bold"), bg="#E0F7FA").pack(pady=10)
+
+        self.entry_nama = tk.Entry(self, width=25, justify="center")
+        self.entry_skor = tk.Entry(self, width=25, justify="center")
+        self.entry_nama.insert(0, "Nama")
+        self.entry_skor.insert(0, "Skor")
+
+        self.entry_nama.pack(pady=5)
+        self.entry_skor.pack(pady=5)
+
+        btn_frame = tk.Frame(self, bg="#E0F7FA")
+        btn_frame.pack(pady=10)
+
+        tk.Button(btn_frame, text="Tambah Skor", width=15, bg="#43A047", fg="white", command=self.tambah_skor).grid(row=0, column=0, padx=5)
+        tk.Button(btn_frame, text="Simpan Skor", width=15, bg="#FB8C00", fg="white", command=self.simpan_skor).grid(row=0, column=1, padx=5)
+        tk.Button(btn_frame, text="Update Skor", width=15, bg="#FFB300", fg="black", command=self.update_skor).grid(row=1, column=0, padx=5, pady=5)
+        tk.Button(btn_frame, text="Reset Semua", width=15, bg="#D32F2F", fg="white", command=self.reset_skor).grid(row=1, column=1, padx=5, pady=5)
+
+        tk.Button(self, text="← Kembali ke Welcome", bg="#1976D2", fg="white", 
+                  command=lambda: controller.show_frame(WelcomePage)).pack(pady=5)
+
+        self.table = ttk.Treeview(self, columns=("Nama", "Skor"), show="headings", height=10, selectmode="browse")
+        self.table.column("Nama", anchor="center")
+        self.table.column("Skor", anchor="center")
+        self.table.heading("Nama", text="Nama", anchor="center")
+        self.table.heading("Skor", text="Skor", anchor="center")
+        self.table.pack(pady=10, fill="x", padx=20)
+
+        self.load_data()
+
+    def load_data(self):
+        for row in self.table.get_children():
+            self.table.delete(row)
+
+        try:
+            with open(CSV_FILE, mode='r') as file:
+                reader = csv.DictReader(file)
+                for row in reader:
+                    self.table.insert("", "end", values=(row["Nama"], row["Skor"]))
+        except Exception as e:
+            messagebox.showerror("Error", f"Error loading data: {e}")
+
+    def tambah_skor(self):
+        nama = self.entry_nama.get().strip()
+        skor_baru = self.entry_skor.get().strip()
+
+        if not nama or not skor_baru or nama.lower() == "nama" or skor_baru.lower() == "skor":
