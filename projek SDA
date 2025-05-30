@@ -106,3 +106,65 @@ class TeoriPage(tk.Frame):
         skor_baru = self.entry_skor.get().strip()
 
         if not nama or not skor_baru or nama.lower() == "nama" or skor_baru.lower() == "skor":
+
+messagebox.showwarning("Input Kosong", "Nama dan Skor tidak boleh kosong.")
+            return
+
+        try:
+            skor_baru = int(skor_baru)
+        except ValueError:
+            messagebox.showwarning("Input Salah", "Skor harus berupa angka.")
+            return
+
+        data = []
+        nama_ditemukan = False
+
+        with open(CSV_FILE, mode='r') as file:
+            reader = csv.reader(file)
+            header = next(reader)
+            for row in reader:
+                if row[0].strip().lower() == nama.lower():
+                    try:
+                        skor_lama = int(row[1])
+                    except ValueError:
+                        skor_lama = 0
+                    skor_total = skor_lama + skor_baru
+                    data.append([row[0], str(skor_total)])
+                    nama_ditemukan = True
+                else:
+                    data.append(row)
+
+        if not nama_ditemukan:
+            data.append([nama, str(skor_baru)])
+
+        with open(CSV_FILE, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(header)
+            writer.writerows(data)
+
+        messagebox.showinfo("Sukses", f"Skor untuk '{nama}' berhasil diperbarui!")
+        self.load_data()
+
+    def simpan_skor(self):
+        try:
+            data = []
+            for item in self.table.get_children():
+                values = self.table.item(item, 'values')
+                data.append(values)
+
+            with open(CSV_FILE, mode='w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow(["Nama", "Skor"])
+                writer.writerows(data)
+
+            messagebox.showinfo("Sukses", "Semua skor dari tabel berhasil disimpan ke file.")
+        except Exception as e:
+            messagebox.showerror("Error", f"Gagal menyimpan skor: {e}")
+
+    def update_skor(self):
+        nama = self.entry_nama.get().strip()
+        skor_baru = self.entry_skor.get().strip()
+
+        if not nama or not skor_baru:
+            messagebox.showwarning("Input Kosong", "Nama dan Skor baru harus diisi.")
+            return
