@@ -168,3 +168,47 @@ messagebox.showwarning("Input Kosong", "Nama dan Skor tidak boleh kosong.")
         if not nama or not skor_baru:
             messagebox.showwarning("Input Kosong", "Nama dan Skor baru harus diisi.")
             return
+try:
+            skor_baru = int(skor_baru)
+        except ValueError:
+            messagebox.showwarning("Input Salah", "Skor harus berupa angka.")
+            return
+
+        data = []
+        updated = False
+
+        try:
+            with open(CSV_FILE, mode='r') as file:
+                reader = csv.reader(file)
+                header = next(reader)
+                for row in reader:
+                    if row[0].strip().lower() == nama.lower():
+                        data.append([row[0], str(skor_baru)])
+                        updated = True
+                    else:
+                        data.append(row)
+
+            with open(CSV_FILE, mode='w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow(header)
+                writer.writerows(data)
+
+            if updated:
+                messagebox.showinfo("Update Berhasil", f"Skor '{nama}' berhasil diperbarui.")
+            else:
+                messagebox.showinfo("Tidak Ditemukan", f"Nama '{nama}' belum ada, tidak bisa update.")
+            self.load_data()
+        except Exception as e:
+            messagebox.showerror("Error", f"Error updating data: {e}")
+
+    def reset_skor(self):
+        with open(CSV_FILE, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(["Nama", "Skor"])
+        messagebox.showinfo("Reset", "Semua skor telah dihapus!")
+        self.load_data()
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = App(root)
+    root.mainloop()
