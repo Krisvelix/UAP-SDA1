@@ -1,5 +1,54 @@
-velix
-zawek
-gftgftf6
-tai kucng ya
-selow lah bang
+import tkinter as tk
+from tkinter import ttk, messagebox
+import csv
+import os
+
+CSV_FILE = 'skor.csv'
+
+def init_csv():
+    if not os.path.exists(CSV_FILE):
+        with open(CSV_FILE, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(["Nama", "Skor"])
+
+init_csv()
+
+class App:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Project SDA - Velix Team")
+        self.root.configure(bg="#E0F7FA")
+        self.center_window(500, 500)
+        self.frames = {}
+
+        for F in (WelcomePage, PerkenalanPage, TeoriPage):
+            frame = F(self.root, self)
+            self.frames[F] = frame
+            frame.grid(row=0, column=0, sticky="nsew")
+
+        self.show_frame(WelcomePage)
+
+    def show_frame(self, page):
+        frame = self.frames[page]
+        frame.tkraise()
+
+    def center_window(self, width, height):
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        x = int((screen_width / 2) - (width / 2))
+        y = int((screen_height / 2) - (height / 2))
+        self.root.geometry(f"{width}x{height}+{x}+{y}")
+
+class WelcomePage(tk.Frame):
+    def __init__(self, parent, controller):
+        super().__init__(parent, bg="#E0F7FA")
+        tk.Label(self, text="Selamat Datang di Project SDA", font=("Arial", 18, "bold"), bg="#E0F7FA").pack(pady=30)
+        tk.Button(self, text="Mulai Perkenalan", font=("Arial", 12), bg="#43A047", fg="white", 
+                  command=lambda: controller.show_frame(PerkenalanPage)).pack(pady=10)
+
+class PerkenalanPage(tk.Frame):
+    def __init__(self, parent, controller):
+        super().__init__(parent, bg="#E0F7FA")
+        tk.Label(self, text="Perkenalan Kelompok", font=("Arial", 18, "bold"), bg="#E0F7FA").pack(pady=20)
+        tk.Label(self, text="Kelompok SDA:\n- Krisvelix William_2417051021\n- Setia Diva Erlandi_2417051072\n- Zamzawii Lutfi_2417051016\n- Fahmi Isma Yuda_2417051062",
+                 font=("Arial", 12), justify="left", bg="#E0F7FA").pack(pady=10)
