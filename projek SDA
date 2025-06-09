@@ -38,3 +38,19 @@ class App:
         x = int((screen_width / 2) - (width / 2))
         y = int((screen_height / 2) - (height / 2))
         self.root.geometry(f"{width}x{height}+{x}+{y}")
+
+class WelcomePage(tk.Frame):
+    def _init_(self, parent, controller):
+        super()._init_(parent, bg="#E0F7FA")
+        tk.Label(self, text="Selamat Datang di Project SDA", font=("Arial", 18, "bold"), bg="#E0F7FA").pack(pady=30)
+        tk.Button(self, text="Mulai Perkenalan", font=("Arial", 12), bg="#43A047", fg="white", 
+                  command=lambda: controller.show_frame(PerkenalanPage)).pack(pady=10)
+
+class PerkenalanPage(tk.Frame):
+    def _init_(self, parent, controller):
+        super()._init_(parent, bg="#E0F7FA")
+        tk.Label(self, text="Perkenalan Kelompok", font=("Arial", 18, "bold"), bg="#E0F7FA").pack(pady=20)
+        tk.Label(self, text="Kelompok SDA:\n- Krisvelix William_2417051021\n- Setia Diva Erlandi_2417051072\n- Zamzawii Lutfi_2417051016\n- Fahmi Isma Yuda_2417051062",
+                 font=("Arial", 12), justify="left", bg="#E0F7FA").pack(pady=10)
+        tk.Button(self, text="Lanjut ke Halaman Teori", font=("Arial", 12), bg="#43A047", fg="white", 
+                  command=lambda: controller.show_frame(TeoriPage)).pack(pady=10)
