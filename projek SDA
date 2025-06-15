@@ -158,3 +158,32 @@ class KarateScoreboard:
                 messagebox.showerror("Error", f"Gagal memuat skor: {e}")
         else:
             messagebox.showwarning("Peringatan", "File skor.csv tidak ditemukan.")
+# ================= BAGIAN 4: NAVIGASI + MAIN =================
+class App:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Project SDA KELOMPOK 10")
+        self.current_page = None
+        self.show_welcome()
+
+    def show_welcome(self):
+        self.clear_page()
+        self.current_page = WelcomePage(self.root, self.show_intro)
+
+    def show_intro(self):
+        self.clear_page()
+        self.current_page = IntroPage(self.root, self.show_project)
+
+    def show_project(self):
+        self.clear_page()
+        self.current_page = KarateScoreboard(self.root)
+
+    def clear_page(self):
+        if self.current_page:
+            self.current_page.destroy()
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    root.geometry("900x500")
+    app = App(root)
+    root.mainloop()
