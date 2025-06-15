@@ -30,3 +30,131 @@ class IntroPage:
 
     def destroy(self):
         self.frame.destroy()
+
+class KarateScoreboard:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Karate Scoreboard")
+        self.ao_score = 0
+        self.aka_score = 0
+        self.time = 0
+        self.running = False
+
+        self.root.rowconfigure(0, weight=1)
+        self.root.columnconfigure(0, weight=1)
+        self.root.columnconfigure(1, weight=1)
+
+        self.ao_frame = tk.Frame(root, bg="blue")
+        self.ao_frame.grid(row=0, column=0, sticky="nsew")
+        self.ao_name_var = tk.StringVar(value="Masukkan Nama")
+        tk.Entry(self.ao_frame, textvariable=self.ao_name_var, justify="center", font=("Arial", 14)).pack(pady=10)
+        tk.Label(self.ao_frame, text="Tim 1 (Blue)", bg="blue", fg="white", font=("Arial", 16)).pack()
+        self.ao_label = tk.Label(self.ao_frame, text="0", bg="blue", fg="white", font=("Arial", 48))
+        self.ao_label.pack()
+        tk.Button(self.ao_frame, text="+1", bg="light green", command=self.ao_plus).pack(pady=5)
+        tk.Button(self.ao_frame, text="-1", command=self.ao_minus).pack()
+
+        self.aka_frame = tk.Frame(root, bg="red")
+        self.aka_frame.grid(row=0, column=1, sticky="nsew")
+        self.aka_name_var = tk.StringVar(value="Masukkan Nama")
+        tk.Entry(self.aka_frame, textvariable=self.aka_name_var, justify="center", font=("Arial", 14)).pack(pady=10)
+        tk.Label(self.aka_frame, text="Tim 2 (Red)", bg="red", fg="white", font=("Arial", 16)).pack()
+        self.aka_label = tk.Label(self.aka_frame, text="0", bg="red", fg="white", font=("Arial", 48))
+        self.aka_label.pack()
+        tk.Button(self.aka_frame, text="+1", bg="light green", command=self.aka_plus).pack(pady=5)
+        tk.Button(self.aka_frame, text="-1", command=self.aka_minus).pack()
+
+        self.timer_canvas = tk.Canvas(root, width=300, height=80, highlightthickness=0)
+        self.timer_canvas.place(relx=0.5, rely=0.15, anchor="n")
+        self.timer_canvas.create_rectangle(0, 0, 150, 80, fill="blue", outline="")
+        self.timer_canvas.create_rectangle(150, 0, 300, 80, fill="red", outline="")
+        self.timer_text = self.timer_canvas.create_text(150, 40, text="00:00", fill="white", font=("Arial", 60, "bold"))
+
+        self.controls = tk.Frame(root, pady=10)
+        self.controls.place(relx=0.5, rely=0.7, anchor="s")
+        tk.Button(self.controls, text="Start", width=10, command=self.start_timer).grid(row=0, column=0, padx=5)
+        tk.Button(self.controls, text="Stop", width=10, command=self.stop_timer).grid(row=0, column=1, padx=5)
+        tk.Button(self.controls, text="Reset", width=10, command=self.reset_all).grid(row=0, column=2, padx=5)
+        tk.Button(self.controls, text="Simpan Skor", width=12, command=self.save_score).grid(row=0, column=3, padx=5)
+        tk.Button(self.controls, text="Muat Skor", width=12, command=self.load_score).grid(row=0, column=4, padx=5)
+
+    def ao_plus(self):
+        self.ao_score += 1
+        self.ao_label.config(text=str(self.ao_score))
+
+    def ao_minus(self):
+        self.ao_score = max(0, self.ao_score - 1)
+        self.ao_label.config(text=str(self.ao_score))
+
+    def aka_plus(self):
+        self.aka_score += 1
+        self.aka_label.config(text=str(self.aka_score))
+
+    def aka_minus(self):
+        self.aka_score = max(0, self.aka_score - 1)
+        self.aka_label.config(text=str(self.aka_score))
+
+    def update_timer(self):
+        if self.running:
+            self.time += 1
+            mins = self.time // 60
+            secs = self.time % 60
+            self.timer_canvas.itemconfig(self.timer_text, text=f"{mins:02}:{secs:02}")
+            self.root.after(1000, self.update_timer)
+
+    def start_timer(self):
+        if not self.running:
+            self.running = True
+            self.update_timer()
+
+    def stop_timer(self):
+        self.running = False
+
+    def reset_all(self):
+        self.stop_timer()
+        self.time = 0
+        self.timer_canvas.itemconfig(self.timer_text, text="00:00")
+        self.ao_score = 0
+        self.aka_score = 0
+        self.ao_label.config(text="0")
+        self.aka_label.config(text="0")
+
+    def save_score(self):
+        ao_name = self.ao_name_var.get()
+        aka_name = self.aka_name_var.get()
+        try:
+            with open("skor.csv", "w", newline="") as f:
+                writer = csv.writer(f)
+                writer.writerow([ao_name, self.ao_score])
+                writer.writerow([aka_name, self.aka_score])
+                writer.writerow(["Time", self.time])
+            messagebox.showinfo("Info", "Skor berhasil disimpan.")
+        except Exception as e:
+            messagebox.showerror("Error", f"Gagal menyimpan skor: {e}")
+    
+    def load_score(self):
+        if os.path.exists("skor.csv"):
+            try:
+                with open("skor.csv", "r") as f:
+                    reader = csv.reader(f)
+                    data = list(reader)
+                    ao_name, ao_val = data[0]
+                    aka_name, aka_val = data[1]
+                    _, time_val = data[2]
+
+                    self.ao_name_var.set(ao_name)
+                    self.aka_name_var.set(aka_name)
+                    self.ao_score = int(ao_val)
+                    self.aka_score = int(aka_val)
+                    self.time = int(time_val)
+
+                    self.ao_label.config(text=str(self.ao_score))
+                    self.aka_label.config(text=str(self.aka_score))
+                    mins = self.time // 60
+                    secs = self.time % 60
+                    self.timer_canvas.itemconfig(self.timer_text, text=f"{mins:02}:{secs:02}")
+                messagebox.showinfo("Info", "Skor berhasil dimuat.")
+            except Exception as e:
+                messagebox.showerror("Error", f"Gagal memuat skor: {e}")
+        else:
+            messagebox.showwarning("Peringatan", "File skor.csv tidak ditemukan.")
