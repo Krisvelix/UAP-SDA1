@@ -12,3 +12,21 @@ class WelcomePage:
 
     def destroy(self):
         self.frame.destroy()
+
+class IntroPage:
+    def __init__(self, master, switch_to_project):
+        self.frame = tk.Frame(master, bg="pink")
+        self.frame.pack(fill="both", expand=True)
+        tk.Label(self.frame, text="Anggota Kelompok", bg="pink", font=("Arial", 25, "bold"), anchor="center", width=30).pack(pady=30, fill="x")
+        anggota = [
+            "-1. Krisvelix William",
+            "-2. Setia Diva Erlandi",
+            "-3. Fahmi Isma Yuda",
+            "-4. ZamZawi Lutfi"
+        ]
+        for nama in anggota:
+            tk.Label(self.frame, text=nama, bg="pink", font=("Arial", 15), anchor="center", width=30).pack(padx=30, fill="x")
+        tk.Button(self.frame, text="Lanjut ke Project", font=15, width=15, height=2, command=switch_to_project).pack(pady=20)
+
+    def destroy(self):
+        self.frame.destroy()
