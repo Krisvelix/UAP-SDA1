@@ -158,7 +158,6 @@ class KarateScoreboard:
                 messagebox.showerror("Error", f"Gagal memuat skor: {e}")
         else:
             messagebox.showwarning("Peringatan", "File skor.csv tidak ditemukan.")
-# ================= BAGIAN 4: NAVIGASI + MAIN =================
 class App:
     def __init__(self, root):
         self.root = root
